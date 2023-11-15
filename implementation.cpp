@@ -699,3 +699,8 @@ void fun(string s1, string s2, string &temp1_s1, string &temp2_s1, string &temp1
     while (temp2_s2.size() > 4)
         temp2_s2.erase(0, 1);
 }
+
+void machine::load_program(fstream &file) {
+     ram.load_memory(file);
+}
+
