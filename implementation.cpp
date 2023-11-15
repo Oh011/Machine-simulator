@@ -146,6 +146,31 @@ int cpu::decode(memory &x) {
 
 
 
+            case '7': {
+
+                // Instruction: Bitwise OR operation between two registers
+                char temp1 = IR.content[2];
+                char temp2 = IR.content[3];
+
+                string t1 = "R";
+                t1.push_back(temp1);
+
+                string t2 = "R";
+                t2.push_back(temp2);
+
+                // Perform bitwise OR operation and store result in a register
+                OR(IR.content[1], reg[t1].content, reg[t2].content);
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
+
+
+
 
                 
 
