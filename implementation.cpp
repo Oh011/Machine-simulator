@@ -707,3 +707,89 @@ void machine::load_program(fstream &file) {
 machine::machine() {
 
 }
+
+void machine::show() {
+
+    // Display the data input window header.
+    cout << "data input window:\n";
+
+    // Display the data in the data input window.
+    for(auto i:ram.data_input)
+        cout << i << " ";
+
+    // Display separator line.
+    cout << "\n========================================================================"
+            "=================\n";
+
+    // Initialize counters.
+    int count = 0;
+    int count2 = 1;
+    int countr = 0;
+
+    // Display column headers and program counter (PC).
+    cout << "  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F    "
+            "| PC=" << z.program_counter << "         |\n";
+    ++count2;
+
+    // Iterate over memory cells.
+    for (auto i: ram.cells) {
+
+        // Display row index.
+        if (count == 0)
+            cout << int_to_char(count2-2) << " ";
+
+        // Display memory cell content.
+        if (count < 16) {
+            if (i.second.size() == 1)
+                cout << "0" << i.second << "  ";
+            else
+                cout << i.second << "  ";
+        }
+
+        ++count;
+
+        // Display Instruction Register (IR) when the first row is complete.
+        if (count == 16 && count2 == 2) {
+            if (z.IR.content.size() == 1)
+                cout << " | IR=" << "0" << z.IR.content << "      |\n";
+            else
+                cout << " | IR=" << z.IR.content << "       |\n";
+
+            count = 0;
+            ++count2;
+        }
+
+            // Display register values when all rows are complete.
+        else if (count == 16 && count2 > 2) {
+            // Display register values.
+            if (countr < 16) {
+                string temp1 = "R";
+                string temp2 = "R";
+
+                temp1.push_back(int_to_char(countr));
+                cout << " | " << temp1 << ":" << z.reg[temp1].content << "  ";
+
+                ++countr;
+
+                temp2.push_back(int_to_char(countr));
+                cout << temp2 << ":" << z.reg[temp2].content << "  |\n";
+
+                ++countr;
+                count = 0;
+
+                ++count2;
+            }
+                // Display an empty row when all registers have been shown.
+            else {
+                cout << " |               |\n";
+                ++count2;
+                count = 0;
+            }
+        }
+    }
+
+    // Display separator line.
+    cout << "========================================================================"
+            "=================\n";
+}
+
