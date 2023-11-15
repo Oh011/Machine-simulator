@@ -78,6 +78,28 @@ int cpu::decode(memory &x) {
 
 
 
+            case '4': {
+
+                // Instruction: Move content from one register to another
+                char temp1 = IR.content[2];
+                char temp2 = IR.content[3];
+
+                string t1 = "R";
+                string t2 = "R";
+
+
+                reg[t2].content = reg[t1].content;
+                reg[t1].content = "00";
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
+
+
 
 
                 
