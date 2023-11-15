@@ -235,6 +235,50 @@ int cpu::decode(memory &x) {
             }
 
 
+                 case 'A': {
+
+                // Instruction: Rotate the content of a register to the right
+                char temp1 = IR.content[1];
+                int y = int(IR.content[3]) - 1;
+
+                string t1 = "R";
+                t1.push_back(temp1);
+
+                // Perform right rotation and store result in the same register
+                reg[t1].content = rotate(y, reg[t1].content);
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
+            case 'B': {
+
+                // Instruction: Conditional jump based on the equality of two registers
+                string t1 = "R";
+                char temp1 = IR.content[1];
+                t1.push_back(temp1);
+
+                string t2 = "R";
+                t2.push_back('0');
+
+                // Compare contents of two registers, jump if equal
+                if (reg[t1].content == reg[t2].content) {
+
+                    string n = IR.content.substr(2, 2);
+                    program_counter = n;
+
+                    return 1; // Successful execution
+                }
+
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+                return 1;
+
+            }
+
+
 
 
 
