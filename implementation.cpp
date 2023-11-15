@@ -45,3 +45,18 @@ memory::memory() {
     }
 }
 
+
+
+
+
+
+string decimal_to_binary(int x) {
+
+    // Base case: If the decimal number is 0, return "0" in binary representation.
+    if (x == 0)
+        return "0";
+
+    // Recursive case: Convert the quotient (x / 2) to binary and add the remainder (x % 2).
+    // This makes the binary representation from right to left.
+    return decimal_to_binary(x / 2) + to_string(x % 2);
+}
