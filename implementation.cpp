@@ -4,6 +4,102 @@
 using namespace std;
 
 
+void machine::menu(){
+
+    int option;
+
+    // Display a menu to the user asking if they want to load a program from a file
+    cout<<"Do you want to load a program from a file? :\n"
+          "1-yes\n"
+          "0-no\n";
+
+    // Get user input for the option
+    cin >> option;
+
+    // Validate the user input, ensuring it's either 0 or 1
+    while (option != 0 && option != 1){
+
+        cout<<"invalid option:\n";
+        cout<<"enter a valid option\n";
+        cout<<"1-yes\n"
+              "0-no\n";
+
+        cin >> option;
+    }
+
+    // If the user chooses not to load a program, return from the function
+    if(option == 0)
+        return;
+
+        // If the user chooses to load a program
+    else if (option == 1){
+
+        fstream  file;
+        string f;
+
+        // let the user enter the name of the file
+        cout<<"enter the name of the file:\n";
+        cin >> f;
+
+        // Open the file with a specified path
+        file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
+
+        // Retry opening the file until it succeeds
+        while (file.fail()){
+
+            cout<<"enter the name of the right file:\n";
+            cin>>f;
+
+            file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
+        }
+
+        // Load the program from the file
+        load_program(file);
+
+
+
+        // Continue running the program until the fetch returns -1
+        while (z.fetch(ram)==1) {
+
+            cout<<"do you want to show the memory and cpu register content:\n"
+                  "1-yes\n"
+                  "0-no\n";
+
+            // Get user input for displaying the machine state
+            cin >> option;
+
+            if (option == 1) {
+
+                // Display the state of the machine
+                cout<<"======================================================================================="
+                      "=====\n";
+                show();
+            }
+            else
+                continue;
+
+
+        }
+
+        cout<<"======================================================================================="
+              "====================\n";
+
+        cout<<"do you want to show the memory and cpu register content:\n"
+              "1-yes\n"
+              "0-no\n";
+
+
+        if (option == 1) {
+
+            // Display the state of the machine
+            cout<<"======================================================================================="
+                  "=====\n";
+            show();
+        }
+
+        return;
+    }
+}
 
 memory::memory() {
 
@@ -47,8 +143,161 @@ memory::memory() {
 
 
 
+void memory::load_memory(fstream &file) {
+
+    string temp;
+
+    // Loop through each memory cell in the 'cells' map
+    for (auto &i : cells) {
+
+        // Read the content from the file into the 'temp' variable
+        file >> temp;
+
+        // Store the content of each string in the file in a separate vector 'data_input'
+        //to use it in data input window
+        data_input.push_back(temp);
+
+        if (temp.size()==3)
+            cells[i.first] = temp.substr(2, 1);
+
+        // Update the content of the memory cell, taking only the last two characters of 'temp'
+        //  because the file contains hexadecimal values, and only the last two characters are used
+
+        else
+            cells[i.first] = temp.substr(2, 2);
+
+        // Break the loop if the end of the file is reached
+        if (file.eof())
+            break;
+    }
+}
 
 
+registers::registers() {
+    content="00";
+}
+
+instruction_register::instruction_register() {
+    content="0000";
+}
+
+void instruction_register::load_instruction_registers(string r) {
+    content=r;
+
+}
+
+void registers::load_registers(string r) {
+  content=r;
+}
+
+
+cpu::cpu(){
+
+    int count1 = 48;
+    string temp="R";
+
+    // Loop through 16 registers and initialize them with numbers in hexadecimal
+    for (int i = 0; i <16 ; ++i) {
+        temp.push_back(char(count1));
+
+        // Create a new register with the current name and store it in the 'reg' map
+        reg[temp]=registers();
+
+        // Update the character for the next iteration
+        if (char(count1) == '9')
+            count1 += 8;
+        else
+            ++count1;
+
+        temp.pop_back(); // Remove the last character for the next iteration
+    }
+
+    count1 = 48;
+    int count2 = 48;
+    temp="";
+
+    // Loop through 16 rows and 16 columns to generate unique memory addresses and store them in 'v1'
+    // to be used in PC
+    for (int i = 0; i <16; ++i) {
+
+        temp.push_back(char(count1));
+
+        for (int j = 0; j <16; ++j) {
+
+            temp.push_back(char(count2));
+
+            // Store the  address of all memory cells in 'v1'to use it in PC
+            v1.push_back(temp);
+
+            // Update the second character in the address for the next iteration
+            if (char(count2) == '9')
+                count2 += 8;
+
+            else
+                ++count2;
+
+            temp.pop_back(); // Remove the last character for the next iteration
+        }
+
+        // Update the first character in the address for the next row
+        if (char(count1) == '9')
+            count1 += 8;
+        else
+            ++count1;
+
+        count2 = 48; // Reset the second character
+        temp = "";   // Reset the temporary string for the next row
+    }
+
+    // Initialize the instruction register 'IR' with content "0000" and set the program counter to "00"
+    IR.content="0000";
+    program_counter="00";
+}
+
+
+
+
+int cpu::fetch(memory  &x) {
+
+    // get the content of the memory cell pointed by the program counter
+    string temp = x.cells[program_counter];
+
+    // Continue fetching until a complete instruction is obtained not a stored data.
+    while (temp.size() == 2) {
+        string temp2 = temp;
+
+        // Move the program counter to the next memory address
+        program_counter = *(find(v1.begin(), v1.end(), program_counter) + 1);
+        temp = x.cells[program_counter];
+
+
+
+         //Check for the end of program
+        if (temp == "00" && temp2 == "00") {
+            program_counter = *(find(v1.begin(), v1.end(), program_counter) -1);
+            return -1; // End of program
+        }
+
+    }
+
+    // If a single character instruction is found,
+    // get the content of the next two memory cells to form the complete instruction.
+
+    if (temp.size() == 1) {
+
+        // get the next two memory cells to form the complete instruction
+        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 1)]);
+        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 2)]);
+
+        // Load the complete instruction into the instruction register
+        IR.load_instruction_registers(temp);
+
+        // Decode and execute the instruction
+        return decode(x);
+    }
+
+    return -1;
+}
 
 int cpu::decode(memory &x) {
 
@@ -280,13 +529,6 @@ int cpu::decode(memory &x) {
 }
 
 
-
-
-
-
-
-                
-
 string decimal_to_binary(int x) {
 
     // Base case: If the decimal number is 0, return "0" in binary representation.
@@ -297,6 +539,8 @@ string decimal_to_binary(int x) {
     // This makes the binary representation from right to left.
     return decimal_to_binary(x / 2) + to_string(x % 2);
 }
+
+
 
 void cpu::ADD(char t, string s1, string s2) {
 
@@ -363,61 +607,6 @@ void cpu::ADD(char t, string s1, string s2) {
 
 
 // Performs bitwise OR operation on two binary strings and stores the result
-
-
-
-
-
-
-
-
-
-
-string binary_to_hexa(string x) {
-
-    // Initialize an empty string to store the resulting hexadecimal value.
-    string temp;
-
-    // Variables to keep track of the power count and the sum during conversion.
-    int pow_count = 0;
-    int sum1 = 0;
-
-    // Convert the first 4 bits of the binary string to decimal and then to hexadecimal.
-    for (int i = 3; i >= 0; --i) {
-        // If the current bit is '1', add the corresponding power of 2 to the sum.
-        if (x[i] == '1')
-            sum1 += pow(2, pow_count) * 1;
-
-        // Move to the next power of 2.
-        ++pow_count;
-    }
-
-    // Append the hexadecimal representation of the first 4 bits to the result string.
-    temp.push_back(int_to_char(sum1));
-
-    // Reset power count and sum for the next 4 bits.
-    pow_count = 0;
-    sum1 = 0;
-
-    // Convert the last 4 bits of the binary string to decimal and then to hexadecimal.
-    for (int i = 7; i >= 4; --i) {
-        // If the current bit is '1', add the corresponding power of 2 to the sum.
-        if (x[i] == '1')
-            sum1 += pow(2, pow_count) * 1;
-
-        // Move to the next power of 2.
-        ++pow_count;
-    }
-
-    // Append the hexadecimal representation of the last 4 bits to the result string.
-    temp.push_back(int_to_char(sum1));
-
-    // Return the resulting hexadecimal string.
-    return temp;
-}
-
-
-// Performs bitwise OR operation on two binary strings and stores the result
 void cpu::OR(char t, string s1, string s2) {
     // Temporary variables to store binary representations of the operands.
     string temp1_s1;
@@ -454,6 +643,9 @@ void cpu::OR(char t, string s1, string s2) {
     // Store the result in the specified register after converting it to hexadecimal.
     reg[n].content = binary_to_hexa(temp);
 }
+
+// Performs bitwise AND operation on two binary strings and stores the result in
+// a register.
 
 void cpu::AND(char t, string s1, string s2) {
 
@@ -531,6 +723,20 @@ void cpu::XOR(char t, string s1, string s2) {
 }
 
 
+// Rotates a binary string to the left by a specified number of positions.
+string cpu::rotate(int y, string s1) {
+
+    // Perform right rotation by removing the last character and inserting 0 at beginning.
+    while (y--) {
+        s1.pop_back();    // Remove the last character.
+        s1.insert(0, "0"); // Insert "0" at the beginning.
+    }
+
+    // Return the binary string after the left rotation.
+    return s1;
+}
+
+
 int char_to_int(char x) {
     // Use a switch statement to map each hexadecimal character to its corresponding integer value.
     switch (x) {
@@ -587,7 +793,6 @@ int char_to_int(char x) {
             return -1; // Return -1 to indicate an error or an invalid input.
     }
 }
-
 
 char int_to_char(int x) {
 
@@ -646,6 +851,48 @@ char int_to_char(int x) {
     return 0;
 }
 
+string binary_to_hexa(string x) {
+
+    // Initialize an empty string to store the resulting hexadecimal value.
+    string temp;
+
+    // Variables to keep track of the power count and the sum during conversion.
+    int pow_count = 0;
+    int sum1 = 0;
+
+    // Convert the first 4 bits of the binary string to decimal and then to hexadecimal.
+    for (int i = 3; i >= 0; --i) {
+        // If the current bit is '1', add the corresponding power of 2 to the sum.
+        if (x[i] == '1')
+            sum1 += pow(2, pow_count) * 1;
+
+        // Move to the next power of 2.
+        ++pow_count;
+    }
+
+    // Append the hexadecimal representation of the first 4 bits to the result string.
+    temp.push_back(int_to_char(sum1));
+
+    // Reset power count and sum for the next 4 bits.
+    pow_count = 0;
+    sum1 = 0;
+
+    // Convert the last 4 bits of the binary string to decimal and then to hexadecimal.
+    for (int i = 7; i >= 4; --i) {
+        // If the current bit is '1', add the corresponding power of 2 to the sum.
+        if (x[i] == '1')
+            sum1 += pow(2, pow_count) * 1;
+
+        // Move to the next power of 2.
+        ++pow_count;
+    }
+
+    // Append the hexadecimal representation of the last 4 bits to the result string.
+    temp.push_back(int_to_char(sum1));
+
+    // Return the resulting hexadecimal string.
+    return temp;
+}
 
 void fun(string s1, string s2, string &temp1_s1, string &temp2_s1, string &temp1_s2, string &temp2_s2) {
 
@@ -699,6 +946,7 @@ void fun(string s1, string s2, string &temp1_s1, string &temp2_s1, string &temp1
     while (temp2_s2.size() > 4)
         temp2_s2.erase(0, 1);
 }
+
 
 void machine::load_program(fstream &file) {
      ram.load_memory(file);
@@ -791,172 +1039,4 @@ void machine::show() {
     // Display separator line.
     cout << "========================================================================"
             "=================\n";
-}
-
-int cpu::fetch(memory  &x) {
-
-    // get the content of the memory cell pointed by the program counter
-    string temp = x.cells[program_counter];
-
-    // Continue fetching until a complete instruction is obtained not a stored data.
-    while (temp.size() == 2) {
-        string temp2 = temp;
-
-        // Move the program counter to the next memory address
-        program_counter = *(find(v1.begin(), v1.end(), program_counter) + 1);
-        temp = x.cells[program_counter];
-
-
-
-         //Check for the end of program
-        if (temp == "00" && temp2 == "00") {
-            program_counter = *(find(v1.begin(), v1.end(), program_counter) -1);
-            return -1; // End of program
-        }
-
-    }
-
-    // If a single character instruction is found,
-    // get the content of the next two memory cells to form the complete instruction.
-
-    if (temp.size() == 1) {
-
-        // get the next two memory cells to form the complete instruction
-        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 1)]);
-        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 2)]);
-
-        // Load the complete instruction into the instruction register
-        IR.load_instruction_registers(temp);
-
-        // Decode and execute the instruction
-        return decode(x);
-    }
-
-    return -1;
-}
-
-void machine::menu(){
-
-    int option;
-
-    // Display a menu to the user asking if they want to load a program from a file
-    cout<<"Do you want to load a program from a file? :\n"
-          "1-yes\n"
-          "0-no\n";
-
-    // Get user input for the option
-    cin >> option;
-
-    // Validate the user input, ensuring it's either 0 or 1
-    while (option != 0 && option != 1){
-
-        cout<<"invalid option:\n";
-        cout<<"enter a valid option\n";
-        cout<<"1-yes\n"
-              "0-no\n";
-
-        cin >> option;
-    }
-
-    // If the user chooses not to load a program, return from the function
-    if(option == 0)
-        return;
-
-        // If the user chooses to load a program
-    else if (option == 1){
-
-        fstream  file;
-        string f;
-
-        // let the user enter the name of the file
-        cout<<"enter the name of the file:\n";
-        cin >> f;
-
-        // Open the file with a specified path
-        file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
-
-        // Retry opening the file until it succeeds
-        while (file.fail()){
-
-            cout<<"enter the name of the right file:\n";
-            cin>>f;
-
-            file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
-        }
-
-        // Load the program from the file
-        load_program(file);
-
-
-
-        // Continue running the program until the fetch returns -1
-        while (z.fetch(ram)==1) {
-
-            cout<<"do you want to show the memory and cpu register content:\n"
-                  "1-yes\n"
-                  "0-no\n";
-
-            // Get user input for displaying the machine state
-            cin >> option;
-
-            if (option == 1) {
-
-                // Display the state of the machine
-                cout<<"======================================================================================="
-                      "=====\n";
-                show();
-            }
-            else
-                continue;
-
-
-        }
-
-        cout<<"======================================================================================="
-              "====================\n";
-
-        cout<<"do you want to show the memory and cpu register content:\n"
-              "1-yes\n"
-              "0-no\n";
-
-
-        if (option == 1) {
-
-            // Display the state of the machine
-            cout<<"======================================================================================="
-                  "=====\n";
-            show();
-        }
-
-        return;
-    }
-}
-
-void memory::load_memory(fstream &file) {
-
-    string temp;
-
-    // Loop through each memory cell in the 'cells' map
-    for (auto &i : cells) {
-
-        // Read the content from the file into the 'temp' variable
-        file >> temp;
-
-        // Store the content of each string in the file in a separate vector 'data_input'
-        //to use it in data input window
-        data_input.push_back(temp);
-
-        if (temp.size()==3)
-            cells[i.first] = temp.substr(2, 1);
-
-        // Update the content of the memory cell, taking only the last two characters of 'temp'
-        //  because the file contains hexadecimal values, and only the last two characters are used
-
-        else
-            cells[i.first] = temp.substr(2, 2);
-
-        // Break the loop if the end of the file is reached
-        if (file.eof())
-            break;
-    }
 }
