@@ -793,3 +793,46 @@ void machine::show() {
             "=================\n";
 }
 
+int cpu::fetch(memory  &x) {
+
+    // get the content of the memory cell pointed by the program counter
+    string temp = x.cells[program_counter];
+
+    // Continue fetching until a complete instruction is obtained not a stored data.
+    while (temp.size() == 2) {
+        string temp2 = temp;
+
+        // Move the program counter to the next memory address
+        program_counter = *(find(v1.begin(), v1.end(), program_counter) + 1);
+        temp = x.cells[program_counter];
+
+
+
+         //Check for the end of program
+        if (temp == "00" && temp2 == "00") {
+            program_counter = *(find(v1.begin(), v1.end(), program_counter) -1);
+            return -1; // End of program
+        }
+
+    }
+
+    // If a single character instruction is found,
+    // get the content of the next two memory cells to form the complete instruction.
+
+    if (temp.size() == 1) {
+
+        // get the next two memory cells to form the complete instruction
+        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 1)]);
+        temp.append(x.cells[*(find(v1.begin(), v1.end(), program_counter) + 2)]);
+
+        // Load the complete instruction into the instruction register
+        IR.load_instruction_registers(temp);
+
+        // Decode and execute the instruction
+        return decode(x);
+    }
+
+    return -1;
+}
+
+
