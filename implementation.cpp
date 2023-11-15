@@ -279,6 +279,20 @@ int cpu::decode(memory &x) {
             }
 
 
+                
+                
+             case 'C': //Halt execution
+                return -1;
+
+
+        }
+
+
+    return 1;
+
+}
+
+
 
 
 
