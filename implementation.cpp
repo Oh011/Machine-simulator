@@ -704,3 +704,6 @@ void machine::load_program(fstream &file) {
      ram.load_memory(file);
 }
 
+machine::machine() {
+
+}
