@@ -50,6 +50,38 @@ memory::memory() {
 
 
 
+int cpu::decode(memory &x) {
+
+
+    // Switch statement based on the opcode (first character of the instruction)
+
+        switch (IR.content[0]) {
+
+            case '1': {
+
+                // Instruction: Load content from memory to register
+                char temp = IR.content[1];
+                string t = "R";
+
+                string t2 = IR.content.substr(2, 2);
+                t.push_back(temp);
+
+                reg[t].content = x.cells[t2];
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
+
+
+
+
+
+                
+
 string decimal_to_binary(int x) {
 
     // Base case: If the decimal number is 0, return "0" in binary representation.
