@@ -180,3 +180,55 @@ void cpu::ADD(char t, string s1, string s2) {
 
 
 // Performs bitwise OR operation on two binary strings and stores the result
+
+
+
+
+
+
+
+
+
+
+string binary_to_hexa(string x) {
+
+    // Initialize an empty string to store the resulting hexadecimal value.
+    string temp;
+
+    // Variables to keep track of the power count and the sum during conversion.
+    int pow_count = 0;
+    int sum1 = 0;
+
+    // Convert the first 4 bits of the binary string to decimal and then to hexadecimal.
+    for (int i = 3; i >= 0; --i) {
+        // If the current bit is '1', add the corresponding power of 2 to the sum.
+        if (x[i] == '1')
+            sum1 += pow(2, pow_count) * 1;
+
+        // Move to the next power of 2.
+        ++pow_count;
+    }
+
+    // Append the hexadecimal representation of the first 4 bits to the result string.
+    temp.push_back(int_to_char(sum1));
+
+    // Reset power count and sum for the next 4 bits.
+    pow_count = 0;
+    sum1 = 0;
+
+    // Convert the last 4 bits of the binary string to decimal and then to hexadecimal.
+    for (int i = 7; i >= 4; --i) {
+        // If the current bit is '1', add the corresponding power of 2 to the sum.
+        if (x[i] == '1')
+            sum1 += pow(2, pow_count) * 1;
+
+        // Move to the next power of 2.
+        ++pow_count;
+    }
+
+    // Append the hexadecimal representation of the last 4 bits to the result string.
+    temp.push_back(int_to_char(sum1));
+
+    // Return the resulting hexadecimal string.
+    return temp;
+}
