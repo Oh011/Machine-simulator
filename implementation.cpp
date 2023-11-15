@@ -143,6 +143,30 @@ int cpu::decode(memory &x) {
             }
 
 
+              case '5': {
+
+                // Instruction: Add content of two registers and store in a third register
+                char temp1 = IR.content[2];
+                char temp2 = IR.content[3];
+
+                string t1 = "R";
+                t1.push_back(temp1);
+
+                string t2 = "R";
+                t2.push_back(temp2);
+
+
+
+                // Perform addition and store result in a register
+                ADD(IR.content[1], reg[t1].content, reg[t2].content);
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
 
 
 
