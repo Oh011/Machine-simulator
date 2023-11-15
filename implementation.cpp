@@ -646,3 +646,56 @@ char int_to_char(int x) {
     return 0;
 }
 
+
+void fun(string s1, string s2, string &temp1_s1, string &temp2_s1, string &temp1_s2, string &temp2_s2) {
+
+    // Convert the first character of the first hexa number value to a 4-bit binary string.
+
+    temp1_s1 = decimal_to_binary(char_to_int(s1[1]));
+
+
+    // Ensure that the binary string is exactly 4 bits long.
+    while (temp1_s1.size() < 4)
+        temp1_s1.insert(0, "0");
+
+    while (temp1_s1.size() > 4)
+        temp1_s1.erase(0, 1);
+
+
+
+    // Convert the second character of the first hexa number value to a 4-bit binary string.
+    temp2_s1 = decimal_to_binary(char_to_int(s1[0]));
+
+
+    // Ensure that the binary string is exactly 4 bits long.
+    while (temp2_s1.size() < 4)
+        temp2_s1.insert(0, "0");
+
+    while (temp2_s1.size() > 4)
+        temp2_s1.erase(0, 1);
+
+
+
+    // Convert the first character of the second hexa number value to a 4-bit binary string
+    temp1_s2 = decimal_to_binary(char_to_int(s2[1]));
+
+
+
+    // Ensure that the binary string is exactly 4 bits long.
+    while (temp1_s2.size() < 4)
+        temp1_s2.insert(0, "0");
+
+    while (temp1_s2.size() > 4)
+        temp1_s2.erase(0, 1);
+
+
+    // Convert the second character of the second hexa number value to a 4-bit binary string
+    temp2_s2 = decimal_to_binary(char_to_int(s2[0]));
+
+    // Ensure that the binary string is exactly 4 bits long.
+    while (temp2_s2.size() < 4)
+        temp2_s2.insert(0, "0");
+
+    while (temp2_s2.size() > 4)
+        temp2_s2.erase(0, 1);
+}
