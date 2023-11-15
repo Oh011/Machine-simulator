@@ -493,3 +493,39 @@ void cpu::AND(char t, string s1, string s2) {
     reg[n].content = binary_to_hexa(temp);
 }
 
+void cpu::XOR(char t, string s1, string s2) {
+    // Temporary variables to store binary representations of the operands.
+    string temp1_s1;
+    string temp2_s1;
+
+    string temp1_s2;
+    string temp2_s2;
+
+    // this Function converts hexa digits of the registers content
+    // after converting every hexa digit to decimal then to binary
+    // and perform  transformation on two binary strings.
+    fun(s1, s2, temp1_s1, temp2_s1, temp1_s2, temp2_s2);
+
+    // Concatenate the binary representations to form complete binary numbers.
+    string num1 = temp2_s1.append(temp1_s1);
+    string num2 = temp2_s2.append(temp1_s2);
+
+    // Temporary variable to store the result of XOR operation.
+    string temp;
+
+    // Perform bitwise XOR operation on each pair of corresponding bits.
+    for (int i = 0; i < 8; ++i) {
+        if (num1[i] == num2[i])
+            temp.push_back('0');
+        else
+            temp.push_back('1');
+    }
+
+    // Register identifier and register name construction.
+    char temp2 = t;
+    string n = "R";
+    n.push_back(temp2);
+
+    // Store the result in the specified register after converting it to hexadecimal.
+    reg[n].content = binary_to_hexa(temp);
+}
