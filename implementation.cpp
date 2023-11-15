@@ -932,4 +932,31 @@ void machine::menu(){
     }
 }
 
+void memory::load_memory(fstream &file) {
 
+    string temp;
+
+    // Loop through each memory cell in the 'cells' map
+    for (auto &i : cells) {
+
+        // Read the content from the file into the 'temp' variable
+        file >> temp;
+
+        // Store the content of each string in the file in a separate vector 'data_input'
+        //to use it in data input window
+        data_input.push_back(temp);
+
+        if (temp.size()==3)
+            cells[i.first] = temp.substr(2, 1);
+
+        // Update the content of the memory cell, taking only the last two characters of 'temp'
+        //  because the file contains hexadecimal values, and only the last two characters are used
+
+        else
+            cells[i.first] = temp.substr(2, 2);
+
+        // Break the loop if the end of the file is reached
+        if (file.eof())
+            break;
+    }
+}
