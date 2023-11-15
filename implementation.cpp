@@ -835,4 +835,101 @@ int cpu::fetch(memory  &x) {
     return -1;
 }
 
+void machine::menu(){
+
+    int option;
+
+    // Display a menu to the user asking if they want to load a program from a file
+    cout<<"Do you want to load a program from a file? :\n"
+          "1-yes\n"
+          "0-no\n";
+
+    // Get user input for the option
+    cin >> option;
+
+    // Validate the user input, ensuring it's either 0 or 1
+    while (option != 0 && option != 1){
+
+        cout<<"invalid option:\n";
+        cout<<"enter a valid option\n";
+        cout<<"1-yes\n"
+              "0-no\n";
+
+        cin >> option;
+    }
+
+    // If the user chooses not to load a program, return from the function
+    if(option == 0)
+        return;
+
+        // If the user chooses to load a program
+    else if (option == 1){
+
+        fstream  file;
+        string f;
+
+        // let the user enter the name of the file
+        cout<<"enter the name of the file:\n";
+        cin >> f;
+
+        // Open the file with a specified path
+        file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
+
+        // Retry opening the file until it succeeds
+        while (file.fail()){
+
+            cout<<"enter the name of the right file:\n";
+            cin>>f;
+
+            file.open(R"(C:\oop\A2_Task3_ s17,s18 _20210066- 20221245 - 20220235\)" + f + ".txt");
+        }
+
+        // Load the program from the file
+        load_program(file);
+
+
+
+        // Continue running the program until the fetch returns -1
+        while (z.fetch(ram)==1) {
+
+            cout<<"do you want to show the memory and cpu register content:\n"
+                  "1-yes\n"
+                  "0-no\n";
+
+            // Get user input for displaying the machine state
+            cin >> option;
+
+            if (option == 1) {
+
+                // Display the state of the machine
+                cout<<"======================================================================================="
+                      "=====\n";
+                show();
+            }
+            else
+                continue;
+
+
+        }
+
+        cout<<"======================================================================================="
+              "====================\n";
+
+        cout<<"do you want to show the memory and cpu register content:\n"
+              "1-yes\n"
+              "0-no\n";
+
+
+        if (option == 1) {
+
+            // Display the state of the machine
+            cout<<"======================================================================================="
+                  "=====\n";
+            show();
+        }
+
+        return;
+    }
+}
+
 
