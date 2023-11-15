@@ -74,8 +74,6 @@ int cpu::decode(memory &x) {
                 return 1; // Successful execution
             }
 
-
-            
             case '2': {
 
                 // Instruction: Load immediate value to register
@@ -119,10 +117,6 @@ int cpu::decode(memory &x) {
                 return 1; // Successful execution
             }
 
-
-
-
-
             case '4': {
 
                 // Instruction: Move content from one register to another
@@ -142,8 +136,7 @@ int cpu::decode(memory &x) {
                 return 1; // Successful execution
             }
 
-
-              case '5': {
+            case '5': {
 
                 // Instruction: Add content of two registers and store in a third register
                 char temp1 = IR.content[2];
@@ -168,8 +161,6 @@ int cpu::decode(memory &x) {
 
 
 
-
-
             case '7': {
 
                 // Instruction: Bitwise OR operation between two registers
@@ -190,7 +181,6 @@ int cpu::decode(memory &x) {
 
                 return 1; // Successful execution
             }
-
 
             case '8': {
 
@@ -235,7 +225,7 @@ int cpu::decode(memory &x) {
             }
 
 
-                 case 'A': {
+            case 'A': {
 
                 // Instruction: Rotate the content of a register to the right
                 char temp1 = IR.content[1];
@@ -278,10 +268,7 @@ int cpu::decode(memory &x) {
 
             }
 
-
-                
-                
-             case 'C': //Halt execution
+            case 'C': //Halt execution
                 return -1;
 
 
@@ -291,6 +278,7 @@ int cpu::decode(memory &x) {
     return 1;
 
 }
+
 
 
 
