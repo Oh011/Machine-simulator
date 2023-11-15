@@ -75,6 +75,51 @@ int cpu::decode(memory &x) {
             }
 
 
+            
+            case '2': {
+
+                // Instruction: Load immediate value to register
+                char temp = IR.content[1];
+                string t = "R";
+                t.push_back(temp);
+
+                // Load immediate value to register
+                reg[t].content = IR.content.substr(2, 2);
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+            case '3': {
+
+                // Instruction: Store content from register to memory
+
+                char temp = IR.content[1];
+                string t = "R";
+
+                string t2 = IR.content.substr(2, 2);
+                t.push_back(temp);
+
+                if (t2=="00"){
+                    cout<<reg[t].content<<'\n';
+                    cout<<"======================================================================================="
+                          "=====\n";
+                    program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+                    return 1;
+                }
+
+
+                x.cells[t2] = reg[t].content;
+
+                // Move to the next instruction in memory
+                program_counter = *(find(v1.begin(), v1.end(), program_counter) + 3);
+
+                return 1; // Successful execution
+            }
+
+
 
 
 
